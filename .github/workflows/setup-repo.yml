@@ -1,0 +1,25 @@
+name: Configure Branch Protection
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  protect-branch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Set protection rules
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh api -X PUT /repos/$REPO/branches/main/protection \
+            -f required_status_checks=null \
+            -f "enforce_admins=false" \
+            -f "required_pull_request_reviews[required_approving_review_count]=1" \
+            -f "required_pull_request_reviews[dismiss_stale_reviews]=true" \
+            -f "restrictions=null"
